@@ -1,0 +1,5 @@
+# go binary output
+vaidya-signal
+
+# script to set environment variables
+local-env.sh
