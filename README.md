@@ -24,3 +24,5 @@ The Vaidya Signal is triggered when these three conditions are met:
 ## Questions
 
 - Do you the low of day candle sticks or the close of each day to look for lows?
+- Is it okay to use close values to calculate SMAs, EMAs, etc.?
+- Do you care about triggers where volume at L2 is not lower than it was at L1?
