@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -38,18 +39,18 @@ func main() {
 
 	today := time.Now().Add(-15 * time.Minute) // 15 minutes are subtracted due to Alpaca free-tier limitations
 	fiveYearsAgo := today.AddDate(-5, 0, 0)
-	sixYearsAgo := today.AddDate(-6, 0, 0)
+	sevenYearsAgo := today.AddDate(-7, 0, 0)
 	fmt.Println("[ DEBUG ] Today:", today.Format("2006/01/02"))
-	fmt.Println("[ DEBUG ] Six Years Ago:", sixYearsAgo.Format("2006/01/02"))
+	fmt.Println("[ DEBUG ] Seven Years Ago:", sevenYearsAgo.Format("2006/01/02"))
 
 	for _, ticker := range tickers {
 		fmt.Println("-----------------------------------------------------------")
 		fmt.Println("[ INFO ] Starting detection for ticker:", ticker)
 
-		// get day bars for past 6 years from Alpaca
+		// get day bars for past 7 years from Alpaca
 		bars, err := marketdata.GetBars(ticker, marketdata.GetBarsRequest{
 			TimeFrame: marketdata.OneDay,
-			Start:     sixYearsAgo,
+			Start:     sevenYearsAgo,
 			End:       today,
 		})
 		panicOnNotNil(err)
@@ -61,26 +62,33 @@ func main() {
 		// loop over days to generate indicators
 		var last12EMA float64
 		var last26EMA float64
-		// var lastAvgGain float64 = 0 // for RSI
-		// var lastAvgLoss float64 = 0 // for RSI
+		var lastAvgGain float64 = 0 // for RSI
+		var lastAvgLoss float64 = 0 // for RSI
 		var indicators = make([]Indicators, len(bars))
 		for i, bar := range bars {
-			// skip first 25 day bars
+			// skip first 25 bars
 			if i < 25 {
 				continue
 			}
 
-			// 26th day bar
+			// initialize EMAs and Avg Gain/Loss on bar 26
 			if i == 25 {
 				last12EMA = calcBarCloseSMA(bars[i-11 : i+1])
 				last26EMA = calcBarCloseSMA(bars[i-25 : i+1])
-				indicators[i].MACD = last12EMA - last26EMA
+
+				lastAvgGain = calcFirstAvgGainLoss(bars[i-RSI_PERIOD:i+1], true)
+				lastAvgLoss = calcFirstAvgGainLoss(bars[i-RSI_PERIOD:i+1], false)
+
 				continue
 			}
 
 			last12EMA = calcEMA(bar.Close, last12EMA, 12, EMA12_SMOOTHING)
 			last26EMA = calcEMA(bar.Close, last26EMA, 26, EMA26_SMOOTHING)
 			indicators[i].MACD = last12EMA - last26EMA
+
+			lastAvgGain = calcAvgGainLoss(RSI_PERIOD, lastAvgGain, bars[i-1].Close, bar.Close, true)
+			lastAvgLoss = calcAvgGainLoss(RSI_PERIOD, lastAvgLoss, bars[i-1].Close, bar.Close, false)
+			indicators[i].RSI = 100 - 100/(1+(lastAvgGain/lastAvgLoss))
 		}
 
 		// define output directory and filename
@@ -120,7 +128,7 @@ func main() {
 			if bar.Timestamp.Before(fiveYearsAgo) {
 				continue
 			}
-			
+
 			// write row
 			dataWriter.Write([]string{
 				bar.Timestamp.Format("2006-01-02"),
@@ -208,4 +216,45 @@ func calcSMA(values []float64) float64 {
 func calcEMA(price, lastEMA float64, period int, smoothing float64) float64 {
 	multiplier := smoothing / float64(period+1)
 	return price*multiplier + lastEMA*(1-multiplier)
+}
+
+/*
+gainOrLoss bool: true -> calculate avg. gain, false -> calculate avg. loss
+*/
+func calcFirstAvgGainLoss(bars []marketdata.Bar, gainOrLoss bool) float64 {
+	var gainLossSum float64 = 0
+
+	// sum gain or loss
+	for i, bar := range bars {
+		// skip first bar
+		if i == 0 {
+			continue
+		}
+
+		if gainOrLoss {
+			// calculate gain
+			gainLossSum += math.Max(bar.Close-bars[i-1].Close, 0)
+		} else {
+			// sum loss
+			gainLossSum += math.Max(bars[i-1].Close-bar.Close, 0)
+		}
+	}
+
+	return gainLossSum / float64(len(bars)-1)
+}
+
+/*
+gainOrLoss bool: true -> calculate avg. gain, false -> calculate avg. loss
+*/
+func calcAvgGainLoss(period int, prevGainLoss float64, last, current float64, gainOrLoss bool) float64 {
+	var gainLoss float64
+	if gainOrLoss {
+		// calculate gain
+		gainLoss = math.Max(current-last, 0)
+	} else {
+		// calculate loss
+		gainLoss = math.Max(last-current, 0)
+	}
+
+	return (prevGainLoss*float64(period-1) + gainLoss) / float64(period)
 }
