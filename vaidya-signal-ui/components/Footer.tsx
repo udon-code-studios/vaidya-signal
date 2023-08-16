@@ -6,13 +6,13 @@ export default function Footer() {
       <div className="w-full flex justify-between items-end gap-8">
         <a href="https://udon.studio" target="_blank">
           <div>
-            <icons.UdonLogoBgBlack class="w-16 sm:w-20" />
+            <icons.UdonLogoBgBlack class="w-14 sm:w-20" />
           </div>
         </a>
 
         <div className="flex gap-4 pr-4">
           <a
-            href="https://github.com/udon-code-studios/lol-time"
+            href="https://github.com/udon-code-studios/vaidya-signal"
             target="_blank"
             className="hover:underline"
           >
