@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math"
@@ -16,6 +17,7 @@ import (
 const EMA12_SMOOTHING float64 = 2
 const EMA26_SMOOTHING float64 = 2
 const RSI_PERIOD int = 14
+const LOW_DETECTION int = 3 // # of days before and after a low that should have higher closes
 
 func main() {
 	//--------------------------------------------------------------------------
@@ -34,7 +36,7 @@ func main() {
 	checkAlpacaEnvVars()
 
 	//--------------------------------------------------------------------------
-	// Loop over tickers
+	// Generate data for each ticker
 	//--------------------------------------------------------------------------
 
 	today := time.Now().Add(-15 * time.Minute) // 15 minutes are subtracted due to Alpaca free-tier limitations
@@ -91,10 +93,10 @@ func main() {
 			indicators[i].RSI = 100 - 100/(1+(lastAvgGain/lastAvgLoss))
 		}
 
-		// define output directory and filename
+		// define output directory and filenames
 		outputDirectory := "tickers"
 		outputDataFilename := fmt.Sprintf("%s_data.csv", ticker)
-		// outputMetaFilename := fmt.Sprintf("%s_meta.json", ticker)
+		outputMetaFilename := fmt.Sprintf("%s_meta.json", ticker)
 
 		// create output directory
 		err = os.MkdirAll(outputDirectory, 0755)
@@ -141,6 +143,94 @@ func main() {
 				fmt.Sprintf("%.3f", indicators[i].RSI),
 			})
 		}
+
+		//------------------------------------------------------------------------
+		// find local lows
+		//
+		// NOTE: local lows are defined as having a lower close than the three
+		//       previous days and the three following days
+		//------------------------------------------------------------------------
+
+		var lows []int // indexes of lows
+	find_lows:
+		for i, bar := range bars {
+			// skip lows that are not from last 5 years
+			if bar.Timestamp.Before(fiveYearsAgo) {
+				continue
+			}
+
+			// NOTE: local lows are defined as having a lower close than the three
+			// previous days and the three following days
+
+			// skip first and last three bars
+			if i < LOW_DETECTION || i >= len(bars)-LOW_DETECTION {
+				continue
+			}
+
+			// skip if close is not a low
+			for j := 1; j <= LOW_DETECTION; j++ {
+				if bar.Close > bars[i-j].Close || bar.Close > bars[i+j].Close {
+					continue find_lows
+				}
+			}
+
+			lows = append(lows, i)
+		}
+
+		//------------------------------------------------------------------------
+		// find signal triggers
+		//------------------------------------------------------------------------
+
+		var triggers []Vaidya
+		for i, barIdx := range lows {
+			// skip first low, as a previous low is needed
+			if i == 0 {
+				continue
+			}
+
+			// skip if current low is not lower (i.e. is greater) than previous low
+			// NOTE: if lows are equal, it will not skip
+			if bars[barIdx].Close > bars[lows[i-1]].Close {
+				continue
+			}
+
+			// skip if current low's MACD and RSI are not both higher than the
+			// previous low's
+			// NOTE: if MACDs and RSIs are equal, it will not skip
+			if indicators[barIdx].MACD < indicators[lows[i-1]].MACD ||
+				indicators[barIdx].RSI < indicators[lows[i-1]].RSI {
+				continue
+			}
+
+			// skip if current low's volume is not lower (i.e. is greater) than the
+			// previous low's
+			// NOTE: if volumes are equal, it will not skip
+			if bars[barIdx].Volume > bars[lows[i-1]].Volume {
+				continue
+			}
+
+			// save signal trigger
+			triggers = append(triggers, Vaidya{
+				Low2Date: bars[barIdx].Timestamp.Format("2006-01-02"),
+				Low1Date: bars[lows[i-1]].Timestamp.Format("2006-01-02"),
+			})
+		}
+
+		//------------------------------------------------------------------------
+		// write signals to metadata file
+		//------------------------------------------------------------------------
+
+		// create output metadata file
+		metaFile, err := os.Create(fmt.Sprintf("%s/%s", outputDirectory, outputMetaFilename))
+		panicOnNotNil(err)
+		defer metaFile.Close()
+
+		// encode the metadata to json
+		jsonMetadata, err := json.Marshal(map[string]interface{}{"vaidyaSignals": triggers})
+		panicOnNotNil(err)
+
+		// write json to file
+		metaFile.Write(jsonMetadata)
 	}
 }
 
@@ -151,6 +241,13 @@ func main() {
 type Indicators struct {
 	MACD float64
 	RSI  float64
+}
+
+type Vaidya struct {
+	// low 2 is current low (signal is triggered)
+	Low2Date string `json:"low2Date"`
+	// low 1 is previous low
+	Low1Date string `json:"low1Date"`
 }
 
 //----------------------------------------------------------------------------
