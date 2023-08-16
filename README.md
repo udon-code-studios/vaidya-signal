@@ -6,23 +6,19 @@
 2. Enable the script to be run for weekly and monthly bars.
 3. A GUI and service to visualize when the signal triggered.
 
-## The Vaidya Signal
+## The Vaidya Signal (Bottom Divergence)
 
 The Vaidya Signal is triggered when these three conditions are met:
-- the current low (L2) is lower than the previous low (L1)
+- the current low* (L2) is lower than the previous low (L1)
 - MACD and RSI are both higher at L2 than they were at L1
 - volume at the L2 is lower than it was at L1
+
+\*a low is defined as having 3 days before and after that are higher than the low (using close values)
 
 ## TODO
 
 - [x] create a program which can loop over a list of tickers
 - [x] collect day bars each ticker for the past 6 years
-- [ ] calculate MACD and RSI for each day (using first year as ramp-up)
-- [ ] find all instances of the Vaidya Signal triggering over the past 5 years
-- [ ] output instances to a CSV file
-
-## Questions
-
-- Do you the low of day candle sticks or the close of each day to look for lows?
-- Is it okay to use close values to calculate SMAs, EMAs, etc.?
-- Do you care about triggers where volume at L2 is not lower than it was at L1?
+- [x] calculate MACD and RSI for each day (using two years as ramp-up)
+- [x] find all instances of the Vaidya Signal triggering over the past 5 years
+- [x] output instances to a JSON file
