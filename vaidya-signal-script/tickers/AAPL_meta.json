@@ -1,6 +1,1 @@
-{
-  "vaidyaSignals": [
-    { "low2Date": "2020-11-02", "low1Date": "2020-10-02" },
-    { "low2Date": "2021-03-30", "low1Date": "2021-03-19" }
-  ]
-}
+{"vaidyaSignals":[{"triggerDate":"2020-11-05","low2Date":"2020-11-02","low1Date":"2020-10-02"},{"triggerDate":"2021-04-05","low2Date":"2021-03-30","low1Date":"2021-03-19"}]}

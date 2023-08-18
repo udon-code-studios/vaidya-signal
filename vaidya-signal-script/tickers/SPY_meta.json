@@ -1,7 +1,8 @@
 {
   "vaidyaSignals": [
-    { "low2Date": "2018-11-23", "low1Date": "2018-10-29" },
-    { "low2Date": "2022-05-19", "low1Date": "2022-05-12" },
-    { "low2Date": "2022-10-12", "low1Date": "2022-09-30" }
+    { "triggerDate": "2016-02-17", "low2Date": "2016-02-11", "low1Date": "2016-01-20" },
+    { "triggerDate": "2018-11-28", "low2Date": "2018-11-23", "low1Date": "2018-10-29" },
+    { "triggerDate": "2022-05-24", "low2Date": "2022-05-19", "low1Date": "2022-05-12" },
+    { "triggerDate": "2022-10-17", "low2Date": "2022-10-12", "low1Date": "2022-09-30" }
   ]
 }

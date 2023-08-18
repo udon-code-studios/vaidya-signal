@@ -1,6 +1,1 @@
-{
-  "vaidyaSignals": [
-    { "low2Date": "2022-05-24", "low1Date": "2022-05-12" },
-    { "low2Date": "2022-06-16", "low1Date": "2022-05-24" }
-  ]
-}
+{"vaidyaSignals":[{"triggerDate":"2022-05-27","low2Date":"2022-05-24","low1Date":"2022-05-12"},{"triggerDate":"2022-06-22","low2Date":"2022-06-16","low1Date":"2022-05-24"}]}
