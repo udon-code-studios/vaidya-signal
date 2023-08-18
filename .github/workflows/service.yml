@@ -11,6 +11,8 @@ env:
   GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }} # service account key
   GCP_REGION: us-east4 # service location (Ashburn, VA)
   GCP_SERVICE: vaidya-signal-service # cloud run service name
+  GCP_ARTIFACT_REGISTRY_DOMAIN: us-east4-docker.pkg.dev
+  GCP_ARTIFACT_REGISTRY_REPO: containers
   APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
   APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
 
@@ -36,12 +38,12 @@ jobs:
 
       # https://cloud.google.com/sdk/gcloud/reference/auth/configure-docker
       - name: Authorize Docker push
-        run: gcloud auth configure-docker
+        run: gcloud auth configure-docker 
 
       - name: Build and Push Container
         run: |-
-          docker build --build-arg APCA_API_KEY_ID --build-arg APCA_API_SECRET_KEY -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }} ./vaidya-signal-service
-          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
+          docker build --build-arg APCA_API_KEY_ID --build-arg APCA_API_SECRET_KEY -t ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY_REPO }}/${{ env.GCP_SERVICE }}:${{ github.sha }} ./vaidya-signal-service
+          docker push ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
 
       # https://github.com/marketplace/actions/deploy-to-cloud-run
       - name: Deploy to Cloud Run
@@ -49,7 +51,7 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: ${{ env.GCP_SERVICE }}
-          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
+          image: ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY_REPO }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
           region: ${{ env.GCP_REGION }}
           flags: --allow-unauthenticated
 
