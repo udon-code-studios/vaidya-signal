@@ -41,9 +41,9 @@ func main() {
 
 	today := time.Now().Add(-15 * time.Minute) // 15 minutes are subtracted due to Alpaca free-tier limitations
 	fiveYearsAgo := today.AddDate(-5, 0, 0)
-	sevenYearsAgo := today.AddDate(-7, 0, 0)
+	tenYearsAgo := today.AddDate(-10, 0, 0)
 	fmt.Println("[ DEBUG ] Today:", today.Format("2006/01/02"))
-	fmt.Println("[ DEBUG ] Seven Years Ago:", sevenYearsAgo.Format("2006/01/02"))
+	fmt.Println("[ DEBUG ] 10 Years Ago:", tenYearsAgo.Format("2006/01/02"))
 
 	for _, ticker := range tickers {
 		fmt.Println("-----------------------------------------------------------")
@@ -52,7 +52,7 @@ func main() {
 		// get day bars for past 7 years from Alpaca
 		bars, err := marketdata.GetBars(ticker, marketdata.GetBarsRequest{
 			TimeFrame: marketdata.OneDay,
-			Start:     sevenYearsAgo,
+			Start:     tenYearsAgo,
 			End:       today,
 		})
 		panicOnNotNil(err)
@@ -211,8 +211,9 @@ func main() {
 
 			// save signal trigger
 			triggers = append(triggers, Vaidya{
-				Low2Date: bars[barIdx].Timestamp.Format("2006-01-02"),
-				Low1Date: bars[lows[i-1]].Timestamp.Format("2006-01-02"),
+				TriggerDate: bars[barIdx+LOW_DETECTION].Timestamp.Format("2006-01-02"),
+				Low2Date:    bars[barIdx].Timestamp.Format("2006-01-02"),
+				Low1Date:    bars[lows[i-1]].Timestamp.Format("2006-01-02"),
 			})
 		}
 
@@ -244,10 +245,9 @@ type Indicators struct {
 }
 
 type Vaidya struct {
-	// low 2 is current low (signal is triggered)
-	Low2Date string `json:"low2Date"`
-	// low 1 is previous low
-	Low1Date string `json:"low1Date"`
+	TriggerDate string `json:"triggerDate"` // day signal was triggered
+	Low2Date    string `json:"low2Date"`    // current low
+	Low1Date    string `json:"low1Date"`    // previous low
 }
 
 //----------------------------------------------------------------------------

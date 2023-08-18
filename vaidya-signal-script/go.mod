@@ -1,4 +1,4 @@
-module github.com/udon-code-sudios/vaidya-signal
+module github.com/udon-code-sudios/vaidya-signal-script
 
 go 1.20
 
