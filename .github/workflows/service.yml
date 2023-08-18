@@ -15,6 +15,7 @@ env:
   GCP_ARTIFACT_REGISTRY_REPO: containers
   APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
   APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
+  PG_URI: ${{ secrets.PG_URI }}
 
 jobs:
   build-and-deploy:
@@ -42,7 +43,7 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build --build-arg APCA_API_KEY_ID --build-arg APCA_API_SECRET_KEY -t ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY_REPO }}/${{ env.GCP_SERVICE }}:${{ github.sha }} ./vaidya-signal-service
+          docker build --build-arg APCA_API_KEY_ID --build-arg APCA_API_SECRET_KEY --build-arg PG_URI -t ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY_REPO }}/${{ env.GCP_SERVICE }}:${{ github.sha }} ./vaidya-signal-service
           docker push ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_ARTIFACT_REGISTRY_REPO }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
 
       # https://github.com/marketplace/actions/deploy-to-cloud-run
