@@ -1,0 +1,57 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "vaidya-signal-service/**"
+      - ".github/workflows/service.yml"
+
+env:
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # project ID
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }} # service account key
+  GCP_REGION: us-east4 # service location (Ashburn, VA)
+  GCP_SERVICE: vaidya-signal-service # cloud run service name
+  APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
+  APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Service
+    runs-on: ubuntu-22.04
+    steps:
+      # https://github.com/marketplace/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # https://github.com/marketplace/actions/authenticate-to-google-cloud
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY }}
+
+      # https://github.com/marketplace/actions/set-up-gcloud-cloud-sdk-environment
+      - name: Setup Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      # https://cloud.google.com/sdk/gcloud/reference/auth/configure-docker
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build and Push Container
+        run: |-
+          docker build --build-arg APCA_API_KEY_ID --build-arg APCA_API_SECRET_KEY -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }} ./vaidya-signal-service
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
+
+      # https://github.com/marketplace/actions/deploy-to-cloud-run
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.GCP_SERVICE }}
+          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.GCP_SERVICE }}:${{ github.sha }}
+          region: ${{ env.GCP_REGION }}
+          flags: --allow-unauthenticated
+
+      - name: Print URL
+        run: echo ${{ steps.deploy.outputs.url }}
