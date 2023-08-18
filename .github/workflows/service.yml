@@ -38,7 +38,7 @@ jobs:
 
       # https://cloud.google.com/sdk/gcloud/reference/auth/configure-docker
       - name: Authorize Docker push
-        run: gcloud auth configure-docker 
+        run: gcloud auth configure-docker ${{ env.GCP_ARTIFACT_REGISTRY_DOMAIN }}
 
       - name: Build and Push Container
         run: |-
