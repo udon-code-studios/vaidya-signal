@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	A "github.com/udon-code-sudios/vaidya-signal-service/api"
 	U "github.com/udon-code-sudios/vaidya-signal-service/utils"
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/marketdata"
@@ -65,10 +66,14 @@ func main() {
 		fmt.Println("[ WARN ] PORT environment variable not set, defaulting to", port)
 	}
 
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Request received for URI:", r.RequestURI, "and method:", r.Method)
-		fmt.Fprintf(w, `{"message": "hello world."}`)
-	})
+	// define endpoints and handlers
+	http.HandleFunc("/", A.UselessHandler)
+	http.HandleFunc("/hello", A.UselessHandler)
+	http.HandleFunc("/alive", A.UselessHandler)
+	http.HandleFunc("/api/v1/add-ticker", A.UselessHandler)
+	http.HandleFunc("/api/v1/remove-ticker", A.UselessHandler)
+	http.HandleFunc("/api/v1/add-email", A.UselessHandler)
+	http.HandleFunc("/api/v1/remove-email", A.UselessHandler)
 
 	// start server
 	log.Fatal(http.ListenAndServe(":"+port, nil))
