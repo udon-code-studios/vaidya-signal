@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -10,6 +12,7 @@ import (
 	U "github.com/udon-code-sudios/vaidya-signal-service/utils"
 
 	"github.com/alpacahq/alpaca-trade-api-go/v3/marketdata"
+	"github.com/go-co-op/gocron"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 )
@@ -42,6 +45,33 @@ func main() {
 
 	db := connectToPg()
 	defer db.Close()
+
+	//--------------------------------------------------------------------------
+	// Create cron job to print status every hour
+	//--------------------------------------------------------------------------
+
+	scheduler := gocron.NewScheduler(time.UTC)
+	scheduler.Every(1).Hour().Do(func() { fmt.Println("[ INFO ] Service is still running...") })
+	scheduler.StartAsync()
+
+	//--------------------------------------------------------------------------
+	// Start HTTP server
+	//--------------------------------------------------------------------------
+
+	// get server port from environment variable
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+		fmt.Println("[ WARN ] PORT environment variable not set, defaulting to", port)
+	}
+
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Request received for URI:", r.RequestURI, "and method:", r.Method)
+		fmt.Fprintf(w, `{"message": "hello world."}`)
+	})
+
+	// start server
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 
 	//--------------------------------------------------------------------------
 	// Generate data for each ticker
