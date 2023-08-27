@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 
-	"github.com/jmoiron/sqlx"
 	S "github.com/udon-code-sudios/vaidya-signal-service/service"
 
 	"fmt"
@@ -41,30 +40,4 @@ func GetVaidyaSignalsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(signalsJSON)
-}
-
-func AddTickerHandler(w http.ResponseWriter, r *http.Request, db *sqlx.DB) {
-	// log request invocation
-	fmt.Println("[ INFO ] Request received for URI:", r.RequestURI, "and method:", r.Method)
-
-	// return wrong method if not POST
-	if r.Method != "POST" {
-		fmt.Println("[ INFO ] Method", r.Method, "is not allowed")
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	// parse request JSON body for ticker
-	// body is in the form {"ticker": "SPY"}
-
-	// var body string
-	// err := json.NewDecoder(r.Body).Decode(&body)
-
-	// if err != nil {
-	// 	fmt.Println("[ ERROR ] Error parsing request body:", err)
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
-
-	S.AddTicker("SPY", db)
 }
