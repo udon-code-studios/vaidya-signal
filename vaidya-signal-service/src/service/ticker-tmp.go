@@ -16,15 +16,9 @@ const RSI_PERIOD int = 14
 const LOW_DETECTION int = 3 // # of days before and after a low that should have higher closes
 
 func GetHistoricalVaidyaSignals(ticker string) []VaidyaSignalsTable {
-	//--------------------------------------------------------------------------
-	// Generate data for each ticker
-	//--------------------------------------------------------------------------
-
 	today := time.Now().Add(-15 * time.Minute) // 15 minutes are subtracted due to Alpaca free-tier limitations
 	fiveYearsAgo := today.AddDate(-5, 0, 0)
 	tenYearsAgo := today.AddDate(-10, 0, 0)
-	fmt.Println("[ DEBUG ] Today:", today.Format("2006/01/02"))
-	fmt.Println("[ DEBUG ] 10 Years Ago:", tenYearsAgo.Format("2006/01/02"))
 
 	fmt.Println("-----------------------------------------------------------")
 	fmt.Println("[ INFO ] Starting detection for ticker:", ticker)
