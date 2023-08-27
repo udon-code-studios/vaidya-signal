@@ -20,7 +20,7 @@ type TickersTable struct {
 }
 
 type VaidyaSignalsTable struct {
-	TriggerDate time.Time `db:"trigger_date"` // day signal was triggered
-	Low2Date    time.Time `db:"low_2_date"`   // current low
-	Low1Date    time.Time `db:"low_1_date"`   // previous low
+	TriggerDate time.Time `db:"trigger_date" json:"trigger_date"` // day signal was triggered
+	Low2Date    time.Time `db:"low_2_date" json:"low_2_date"`   // current low
+	Low1Date    time.Time `db:"low_1_date" json:"low_1_date"`   // previous low
 }
