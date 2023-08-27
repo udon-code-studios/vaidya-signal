@@ -1,12 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	A "github.com/udon-code-sudios/vaidya-signal-service/api"
@@ -16,17 +14,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-
 func main() {
-	//--------------------------------------------------------------------------
-	// Parse flags for tickers
-	//--------------------------------------------------------------------------
-
-	tickers := parseFlags()
-
-	// print parsed flags
-	fmt.Println("[ INFO ] Tickers:", tickers)
-
 	//--------------------------------------------------------------------------
 	// Ensure Alpaca environment variables are set
 	//--------------------------------------------------------------------------
@@ -39,6 +27,7 @@ func main() {
 
 	db := connectToPg()
 	defer db.Close()
+	database := A.Database{DB: db}
 
 	//--------------------------------------------------------------------------
 	// Create cron job to print status every hour
@@ -63,7 +52,7 @@ func main() {
 	http.HandleFunc("/", A.UselessHandler)
 	http.HandleFunc("/hello", A.UselessHandler)
 	http.HandleFunc("/alive", A.UselessHandler)
-	// http.HandleFunc("/api/v1/add-ticker", A.UselessHandler)
+	http.HandleFunc("/api/v1/add-ticker", database.AddTickerHandler)
 	// http.HandleFunc("/api/v1/remove-ticker", A.UselessHandler)
 	// http.HandleFunc("/api/v1/add-email", A.UselessHandler)
 	// http.HandleFunc("/api/v1/remove-email", A.UselessHandler)
@@ -77,28 +66,28 @@ func main() {
 // types
 //----------------------------------------------------------------------------
 
-type DaysTable struct {
-	Date   time.Time `db:"date"`
-	Open   float64   `db:"open"`
-	High   float64   `db:"high"`
-	Low    float64   `db:"low"`
-	Close  float64   `db:"close"`
-	Volume uint64    `db:"volume"`
-	MACD   float64   `db:"macd"`
-	RSI    float64   `db:"rsi"`
-}
+// type DaysTable struct {
+// 	Date   time.Time `db:"date"`
+// 	Open   float64   `db:"open"`
+// 	High   float64   `db:"high"`
+// 	Low    float64   `db:"low"`
+// 	Close  float64   `db:"close"`
+// 	Volume uint64    `db:"volume"`
+// 	MACD   float64   `db:"macd"`
+// 	RSI    float64   `db:"rsi"`
+// }
 
-type TickersTable struct {
-	Ticker    string `db:"ticker"`
-	FirstDate string `db:"first_date"`
-	LastDate  string `db:"last_date"`
-}
+// type TickersTable struct {
+// 	Ticker    string `db:"ticker"`
+// 	FirstDate string `db:"first_date"`
+// 	LastDate  string `db:"last_date"`
+// }
 
-type VaidyaSignalsTable struct {
-	TriggerDate time.Time `db:"trigger_date"` // day signal was triggered
-	Low2Date    time.Time `db:"low_2_date"`   // current low
-	Low1Date    time.Time `db:"low_1_date"`   // previous low
-}
+// type VaidyaSignalsTable struct {
+// 	TriggerDate time.Time `db:"trigger_date"` // day signal was triggered
+// 	Low2Date    time.Time `db:"low_2_date"`   // current low
+// 	Low1Date    time.Time `db:"low_1_date"`   // previous low
+// }
 
 //----------------------------------------------------------------------------
 // helper functions
@@ -108,22 +97,6 @@ func panicOnNotNil(value interface{}) {
 	if value != nil {
 		panic(value)
 	}
-}
-
-func parseFlags() (tickers []string) {
-	// define and parse flags
-	tickersFlag := flag.String("t", "", "Comma-separated list of ticker symbols (format: SYMBOL1,SYMBOL2) (required)")
-	flag.Parse()
-
-	// default tickers to SPY if none specified
-	if *tickersFlag == "" {
-		fmt.Println("[ INFO ] Ticker symbol list flag (-t) is missing. Defaulting to ticker: SPY")
-		tickers = []string{"SPY"}
-	} else {
-		tickers = strings.Split(*tickersFlag, ",")
-	}
-
-	return
 }
 
 /*
