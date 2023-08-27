@@ -6,6 +6,17 @@
 2. Enable the script to be run for weekly and monthly bars.
 3. A GUI and service to visualize when the signal triggered.
 
+### Version 1
+
+Script with outputs JSON of all Vaidya Signal triggers over the past X years.
+
+### Version 2
+
+- website lets users add/remove tickers to track for signal triggers
+- website lets users see historical signal triggers for a tracked ticker
+- service scans tracked tickers daily at 16:20 EST for signal triggers
+- database 
+
 ## The Vaidya Signal (Bottom Divergence)
 
 The Vaidya Signal is triggered when these three conditions are met:
@@ -17,6 +28,7 @@ The Vaidya Signal is triggered when these three conditions are met:
 
 ## TODO
 
+- 
 - [x] create a program which can loop over a list of tickers
 - [x] collect day bars each ticker for the past 6 years
 - [x] calculate MACD and RSI for each day (using two years as ramp-up)
