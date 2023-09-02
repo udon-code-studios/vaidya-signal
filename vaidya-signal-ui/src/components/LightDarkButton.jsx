@@ -2,7 +2,7 @@ export default function LightDarkButton() {
 	return (
 		<button
 			id="theme-btn"
-			class="focus-outline h-6 w-6 fill-skin-base hover:fill-skin-accent hover:-rotate-12"
+			className="focus-outline h-6 w-6 fill-skin-base hover:fill-skin-accent hover:-rotate-12"
 			title="Toggles light & dark"
 			aria-label="auto"
 			aria-live="polite"
