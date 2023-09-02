@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LightDarkButton from '../components/LightDarkButton.jsx';
+import SignalsTest from '../components/SignalsTest.jsx';
 ---
 
 <Layout title="Vaidya Signal">
@@ -11,5 +12,6 @@ import LightDarkButton from '../components/LightDarkButton.jsx';
 			<strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
 		</p>
 		<LightDarkButton />
+		<SignalsTest client:load />
 	</main>
 </Layout>
