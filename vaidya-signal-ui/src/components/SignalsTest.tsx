@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
 const fetchData = async (ticker: string) => {
+  if (!ticker) {
+    return;
+  }
+
   const res = await fetch(
     `https://vaidya-service.udon.studio/api/v1/get-signal-triggers?ticker=${ticker}`,
   );
@@ -25,7 +29,6 @@ export default function SignalsTest() {
   return (
     <div>
       <h1>SignalsTest</h1>
-      <p>{JSON.stringify(data)}</p>
       <input
         type="text"
         value={input}
@@ -36,6 +39,7 @@ export default function SignalsTest() {
       >
         Submit
       </button>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
 }
