@@ -1,4 +1,5 @@
 import CandlestickChart from "@/components/CandlestickChart";
+import AddTickerButton from "@/components/AddTickerButton";
 
 export default function Home() {
   return (
@@ -25,6 +26,7 @@ export default function Home() {
           <strong>3.</strong> volume at the L2 is lower than it was at L1
         </p>
       </div>
+      <AddTickerButton />
       <div className="-mx-10 my-5 border-t border-gray-700" />
       <div className="px-2">
         <CandlestickChart ticker="SPY"/>
