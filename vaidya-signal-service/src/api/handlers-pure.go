@@ -10,12 +10,16 @@ import (
 )
 
 func UselessHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
 	fmt.Println("Request received for URI:", r.RequestURI, "and method:", r.Method)
 	fmt.Fprintf(w, `{"message": "hello world."}`)
 	S.ExportedFunction()
 }
 
 func GetVaidyaSignalsHandler(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
 	// log request invocation
 	fmt.Println("[ INFO ] Request received for URI:", r.RequestURI, "and method:", r.Method)
 
