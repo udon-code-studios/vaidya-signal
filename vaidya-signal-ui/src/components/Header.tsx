@@ -4,7 +4,7 @@ import LightDarkButton from "./LightDarkButton.tsx";
 import SearchLink from "./SearchLink.tsx";
 
 export default function Header(
-  props: { active: "watchlist" | "email" | "search" | undefined },
+  props: { active?: "watchlist" | "email" | "search" },
 ) {
   return (
     <header>
@@ -16,7 +16,7 @@ export default function Header(
           >
             {SITE.title}
           </a>
-          <div className="flex ml-0 mt-0 w-auto gap-x-6 gap-y-0">
+          <div className="flex ml-0 mt-0 w-auto gap-x-8 gap-y-0">
             <a
               href="/watchlist"
               className={"hover:text-skin-accent self-end " +
