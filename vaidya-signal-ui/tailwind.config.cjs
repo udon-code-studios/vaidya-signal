@@ -13,9 +13,9 @@ module.exports = {
   theme: {
     textColor: {
       skin: {
-        base: withOpacity("--color-text-base"),
-        accent: withOpacity("--color-accent"),
-        inverted: withOpacity("--color-fill"),
+        base: withOpacity("--color-text-base"), // black
+        accent: withOpacity("--color-accent"), // blue
+        inverted: withOpacity("--color-fill"),  // white
       },
     },
     backgroundColor: {
