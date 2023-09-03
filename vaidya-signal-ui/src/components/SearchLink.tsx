@@ -10,7 +10,7 @@ export default function SearchLink(props: { active: boolean }) {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="scale-125 sm:scale-100 hover:rotate-12"
+          className="scale-125 sm:scale-100 hover:rotate-12 inline-block h-6 w-6"
         >
           <path
             fill="currentColor"
