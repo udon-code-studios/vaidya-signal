@@ -2,7 +2,7 @@ export default function LightDarkButton() {
   return (
     <button
       id="theme-btn"
-      className="focus-outline hover:rotate-12 hover:text-skin-accent inline-block h-6 w-6 scale-125 sm:scale-100"
+      className="focus-outline hover:rotate-12 hover:text-skin-accent inline-block scale-125 sm:scale-100"
       title="Toggles light & dark"
       aria-label="auto"
       aria-live="polite"
@@ -10,6 +10,7 @@ export default function LightDarkButton() {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         id="moon-svg"
+        className="h-6 w-6"
       >
         <path
           fill="currentColor"
@@ -19,6 +20,7 @@ export default function LightDarkButton() {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         id="sun-svg"
+        className="h-6 w-6"
       >
         <path
           fill="currentColor"
