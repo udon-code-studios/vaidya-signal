@@ -1,11 +1,13 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.tsx';
-import Footer from '../components/Footer';
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
+
+const { ticker } = Astro.params;
 ---
 
 <Layout title="Vaidya Signal">
-	<Header active="watchlist" />
+	<Header />
 	<main class="mx-auto max-w-3xl my-auto">
 		<h1 class="italic px-8">
       Hopefully
