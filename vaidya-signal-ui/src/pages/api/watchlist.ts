@@ -14,17 +14,17 @@ export const GET: APIRoute = async ({ request }) => {
   });
 };
 
-// add or remove ticker from watchlist
-// request body: { ticker: string, action: "add" | "remove" }
+// add or remove tickers from watchlist
+// request body: { tickers: string, action: "add" | "remove" }
 export const POST: APIRoute = async ({ request }) => {
   // get ticker and action from request body
-  const { ticker, action } = await request.json();
+  const { tickers, action } = await request.json();
 
   // add or remove ticker from watchlist
   if (action === "add") {
-    await addToWatchlist(ticker);
+    await addToWatchlist(tickers);
   } else if (action === "remove") {
-    await removeFromWatchlist(ticker);
+    await removeFromWatchlist(tickers);
   }
 
   // return success
