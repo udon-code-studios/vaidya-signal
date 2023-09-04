@@ -2,20 +2,44 @@
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
+import { existsInWatchlist } from "../../utils/supabase";
 import { getSignalTriggers } from "../../utils/vaidya-service";
 import { daysAgo } from "../../utils/pure";
+import AddRemoveTickerButton from "../../components/AddRemoveTickerButton";
 
 const { ticker } = Astro.params;
 
 const triggers = await getSignalTriggers(ticker || "");
+const inWatchlist = await existsInWatchlist(ticker || "");
 ---
 
 <Layout title="Vaidya Signal">
   <Header />
   <main class="mx-auto max-w-3xl w-full flex flex-col py-12 gap-8">
-    <h1 class="px-8 text-5xl font-bold">{ticker}</h1>
-    <div class="px-8">
-      <h2 class="text-xl font-bold pb-4">Signal Triggers</h2>
+    <div class="px-8 flex items-end gap-4 justify-between">
+      <div class="flex gap-4">
+        <h1 class="text-5xl font-bold">{ticker}</h1>
+        {
+          inWatchlist && (
+            <>
+              <div class="flex items-end gap-1 pb-1">
+                <p class="text-xs italic font-bold">watchlisted</p>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 -mb-[2px]" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="m10 16.4l-4-4L7.4 11l2.6 2.6L16.6 7L18 8.4l-8 8Z" />
+                </svg>
+              </div>
+            </>
+          )
+        }
+      </div>
+      <AddRemoveTickerButton ticker={ticker || ""} inWatchlist={inWatchlist} client:load />
+    </div>
+
+    <div class="px-8 flex flex-col">
+      <div>
+        <h2 class="text-xl font-bold pb-4">Signal Triggers</h2>
+      </div>
+
       <ul class="list-disc list-inside space-y-2 pl-4">
         {
           triggers && triggers.length > 0 ? (
