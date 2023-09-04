@@ -1,19 +1,16 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.tsx';
-import Footer from '../components/Footer';
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.tsx";
+import Footer from "../components/Footer";
+import WatchlistTable from "../components/WatchlistTable";
+import AddTickers from "../components/AddTickers.tsx";
 ---
 
 <Layout title="Vaidya Signal">
-	<Header active="watchlist" />
-	<main class="mx-auto max-w-3xl my-auto">
-		<h1 class="italic px-8">
-      Hopefully
-      <a href="https://www.linkedin.com/in/leo6/" target="_blank" class="font-bold text-skin-accent text-xl">
-        someone
-      </a>
-       is working on this page...
-    </h1>
-	</main>
-	<Footer />
+  <Header active="watchlist" />
+  <main class="mx-auto max-w-3xl w-full py-12 flex flex-col gap-12 justify-between h-max">
+    <WatchlistTable client:load />
+    <div class="mx-auto max-w-xl w-full"><AddTickers client:load /></div>
+  </main>
+  <Footer />
 </Layout>
