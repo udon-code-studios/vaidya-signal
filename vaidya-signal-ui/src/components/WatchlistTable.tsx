@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
-import { daysAgo } from "../utils/pure";
+import {
+  daysAgo,
+  sortWatchlistByLastTrigger,
+  sortWatchlistByTicker,
+} from "../utils/pure";
 import { removeFromWatchlist } from "../utils/supabase";
 
 export default function WatchlistTable() {
@@ -12,29 +16,9 @@ export default function WatchlistTable() {
     (async () => {
       const res = await fetch("/api/watchlist");
       const data = await res.json();
-      setWatchlist(data);
+      setWatchlist(sortWatchlistByLastTrigger(data));
     })();
   }, []);
-
-  const sortWatchlistByTicker = () => {
-    const sorted = [...watchlist].sort((a, b) => {
-      if (a.ticker < b.ticker) return -1;
-      if (a.ticker > b.ticker) return 1;
-      return 0;
-    });
-    setWatchlist(sorted);
-  };
-
-  const sortWatchlistByLastTrigger = () => {
-    const sorted = [...watchlist].sort((a, b) => {
-      if (a.last_trigger === null) return 1;
-      if (b.last_trigger === null) return -1;
-      if (a.last_trigger < b.last_trigger) return 1;
-      if (a.last_trigger > b.last_trigger) return -1;
-      return 0;
-    });
-    setWatchlist(sorted);
-  };
 
   return (
     <div className="w-full grid grid-cols-7 px-4 sm:px-20">
@@ -42,7 +26,7 @@ export default function WatchlistTable() {
       <button
         className="col-span-3 font-bold text-2xl text-center flex justify-center items-center gap-3 hover:text-skin-accent ml-4"
         onClick={() => {
-          sortWatchlistByTicker();
+          setWatchlist(sortWatchlistByTicker(watchlist));
         }}
       >
         TICKER
@@ -62,7 +46,7 @@ export default function WatchlistTable() {
       <button
         className="col-span-3 font-bold text-2xl text-center flex justify-center items-center gap-4 hover:text-skin-accent ml-4"
         onClick={() => {
-          sortWatchlistByLastTrigger();
+          setWatchlist(sortWatchlistByLastTrigger(watchlist));
         }}
       >
         LAST SIGNAL
@@ -105,7 +89,13 @@ export default function WatchlistTable() {
             <button
               className="col-span-1 text-red-500 hover:underline decoration-2 decoration-dashed underline-offset-2 decoration-red-500 text-center w-min mx-auto px-3 py-1"
               onClick={async () => {
-                await removeFromWatchlist(ticker.ticker);
+                await fetch("/api/watchlist", {
+                  method: "POST",
+                  body: JSON.stringify({
+                    tickers: ticker.ticker.toLocaleUpperCase(),
+                    action: "remove",
+                  }),
+                });
                 window.location.reload();
               }}
             >
