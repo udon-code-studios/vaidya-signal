@@ -33,7 +33,7 @@ export default function Search({ autofocus = false }: { autofocus?: boolean }) {
           autoFocus={autofocus}
           onKeyDown={(e) => {
             if (e.key === "Enter" && input !== "") {
-              window.location.href = `/ticker/${input}`;
+              window.location.href = `/ticker/${input.toLocaleUpperCase()}`;
             }
           }}
         />
