@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { addTickersToWatchlist } from "../utils/supabase";
 
 export default function AddTickers() {
   const [input, setInput] = useState<string>("");
 
   const handleEnter = async (tickers: string) => {
     if (tickers !== "") {
-      await addTickersToWatchlist(tickers.toLocaleUpperCase());
+      await fetch("/api/watchlist", {
+        method: "POST",
+        body: JSON.stringify({
+          tickers: tickers.toLocaleUpperCase(),
+          action: "add",
+        }),
+      });
       window.location.reload();
     }
   };
