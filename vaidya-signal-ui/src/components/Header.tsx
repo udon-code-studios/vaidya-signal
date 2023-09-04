@@ -12,22 +12,24 @@ export default function Header(
         <div className="flex w-full justify-between p-4 items-center py-8">
           <a
             href="/"
-            className="py-1 text-xl font-semibold sm:static sm:text-2xl"
+            className="py-1 text-xl font-semibold sm:static"
           >
             {SITE.title}
           </a>
           <div className="flex ml-0 mt-0 w-auto gap-x-8 gap-y-0">
             <a
               href="/watchlist"
-              className={"hover:text-skin-accent self-end " +
-                (props.active === "watchlist" ? "text-skin-accent" : "")}
+              className={"hover:text-skin-accent self-end decoration-2 underline-offset-2 decoration-wavy " +
+                (props.active === "watchlist"
+                  ? "text-skin-accent underline"
+                  : "")}
             >
               Watchlist
             </a>
             <a
               href="/email"
-              className={"hover:text-skin-accent " +
-                (props.active === "email" ? "text-skin-accent" : "")}
+              className={"hover:text-skin-accent self-end decoration-2 underline-offset-2 decoration-wavy " +
+                (props.active === "email" ? "text-skin-accent underline" : "")}
             >
               Email
             </a>
