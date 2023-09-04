@@ -1,22 +1,30 @@
+import { useEffect, useState } from "react";
+import { daysAgo } from "../utils/pure";
+
 export default function RecentSignals() {
-  const signals = [
-    { ticker: "AAPL", date: "2023-09-03" },
-    { ticker: "TSLA", date: "2023-09-02" },
-    { ticker: "QQQ", date: "2023-09-01" },
-    { ticker: "AMZN", date: "2023-08-14" },
-    { ticker: "SPY", date: "2023-08-13" },
-    { ticker: "GOOG", date: "2022-01-01" },
-    { ticker: "MSFT", date: "2021-01-01" },
-  ];
+  const [watchlist, setWatchlist] = useState<
+    { last_trigger: string | null; ticker: string }[]
+  >([]);
+
+  // get watchlist on page load
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/watchlist");
+      const data = await res.json();
+      setWatchlist(data.slice(0, 6)); // only show the first 7
+    })();
+  }, []);
 
   return (
     <div className="grid space-y-2">
-      {signals.map((signal, i) => (
-        <a href={`/ticker/${signal.ticker}`} key={i}>
+      {watchlist.map((ticker, i) => (
+        <a href={`/ticker/${ticker.ticker}`} key={i}>
           <div className="grid grid-cols-5 hover:text-skin-accent hover:underline underline-offset-2 decoration-2 content-end">
-            <div className="mx-auto col-span-2 font-bold">{signal.ticker}</div>
+            <div className="mx-auto col-span-2 font-bold">{ticker.ticker}</div>
             <div className="mr-auto col-span-2">
-              {daysAgo(new Date(signal.date))}
+              {ticker.last_trigger
+                ? daysAgo(new Date(ticker.last_trigger))
+                : "never"}
             </div>
             <div className="mr-auto pl-2">➔</div>
           </div>
@@ -24,15 +32,4 @@ export default function RecentSignals() {
       ))}
     </div>
   );
-}
-
-function daysAgo(date: Date) {
-  const today = new Date();
-  const diff = today.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-  if (days === 0) return "today!";
-  if (days === 1) return "yesterday";
-
-  return `${days} days ago`;
 }
