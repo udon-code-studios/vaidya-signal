@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { daysAgo } from "../utils/pure";
+import { daysAgo, sortWatchlistByLastTrigger } from "../utils/pure";
 
 export default function RecentSignals() {
   const [watchlist, setWatchlist] = useState<
@@ -11,7 +11,7 @@ export default function RecentSignals() {
     (async () => {
       const res = await fetch("/api/watchlist");
       const data = await res.json();
-      setWatchlist(data.slice(0, 6)); // only show the first 7
+      setWatchlist(sortWatchlistByLastTrigger(data.slice(0, 7))); // only show the first 7
     })();
   }, []);
 
