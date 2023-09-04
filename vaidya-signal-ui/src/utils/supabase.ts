@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { getMostRecentSignalTrigger } from "./vaidya-service";
 
 //----------------------------------------------
 // supabase client
@@ -102,8 +103,18 @@ export const getWatchlist = async () => {
   return data;
 };
 
-export const addToWatchlist = async (ticker: string) => {
-  const { data, error } = await supabase.from("watchlist").insert([{ ticker: ticker }]);
+export const addToWatchlist = async (tickers: string) => {
+  const tickersArray = tickers.split(" ");
+
+  const insertions: { ticker: string; last_trigger?: string }[] = [];
+  for (const ticker of tickersArray) {
+    const lastSignalTrigger = await getMostRecentSignalTrigger(ticker);
+    insertions.push({ ticker: ticker, last_trigger: lastSignalTrigger });
+  }
+
+  const { data, error } = await supabase
+    .from("watchlist")
+    .upsert(insertions.map((ticker) => ({ ticker: ticker.ticker, last_trigger: ticker.last_trigger })));
   if (error) {
     throw error;
   }
@@ -118,13 +129,9 @@ export const removeFromWatchlist = async (ticker: string) => {
   return data;
 };
 
-export const addTickersToWatchlist = async (tickers: string) => {
-  const tickersArray = tickers.split(" ");
-  const { data, error } = await supabase.from("watchlist").upsert(tickersArray.map((ticker) => ({ ticker: ticker })));
-  if (error) {
-    throw error;
-  }
-  return data;
+export const existsInWatchlist = async (ticker: string) => {
+  const list = await getWatchlist();
+  return list.some((item) => item.ticker === ticker);
 };
 
 //-----------------------------------------------
