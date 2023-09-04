@@ -1,18 +1,5 @@
 import { useEffect, useState } from "react";
-
-const fetchData = async (ticker: string) => {
-  if (!ticker) {
-    return;
-  }
-
-  const res = await fetch(
-    `https://vaidya-service.udon.studio/api/v1/get-signal-triggers?ticker=${ticker}`,
-  );
-
-  if (res.ok) {
-    return await res.json();
-  }
-};
+import { getSignalTriggers } from "../utils/vaidya-service";
 
 export default function SignalsTest() {
   const [input, setInput] = useState("");
@@ -20,10 +7,10 @@ export default function SignalsTest() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.log("ticker", ticker);
-    fetchData(ticker).then((res) => {
+    (async () => {
+      const res = await getSignalTriggers(ticker);
       setData(res);
-    });
+    })();
   }, [ticker]);
 
   return (
