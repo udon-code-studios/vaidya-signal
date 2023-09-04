@@ -8,3 +8,23 @@ export function daysAgo(date: Date) {
 
   return `${days} days ago`;
 }
+
+export const sortWatchlistByTicker = (list: { last_trigger: string | null; ticker: string }[]) => {
+  const sorted = [...list].sort((a, b) => {
+    if (a.ticker < b.ticker) return -1;
+    if (a.ticker > b.ticker) return 1;
+    return 0;
+  });
+  return sorted;
+};
+
+export const sortWatchlistByLastTrigger = (list: { last_trigger: string | null; ticker: string }[]) => {
+  const sorted = [...list].sort((a, b) => {
+    if (a.last_trigger === null) return 1;
+    if (b.last_trigger === null) return -1;
+    if (a.last_trigger < b.last_trigger) return 1;
+    if (a.last_trigger > b.last_trigger) return -1;
+    return 0;
+  });
+  return sorted;
+};
