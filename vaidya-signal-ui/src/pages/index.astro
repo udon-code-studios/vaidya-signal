@@ -1,57 +1,58 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Header from '../components/Header.tsx';
-import Footer from '../components/Footer';
-import RecentSignals from '../components/RecentSignals';
-import SearchBar from '../components/SearchBar';
-import TickerButton from '../components/TickerButton';
-import Hr from '../components/Hr';
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.tsx";
+import Footer from "../components/Footer";
+import RecentSignals from "../components/RecentSignals";
+import SearchBar from "../components/SearchBar";
+import TickerButton from "../components/TickerButton";
 ---
 
 <Layout title="Vaidya Signal">
-	<Header />
-	<main class="mx-auto max-w-3xl flex flex-col px-4 py-8 gap-6 text-skin-base">
-		<p>The <span class="font-bold underline underline-offset-2 decoration-2">Vaidya Signal</span> is a bottom reversal signal which is triggered when the following conditions are met:</p>
-		<div class="pl-8">
-			<p><strong class="text-skin-accent">1.</strong> the current low * (L2) is lower than the previous low (L1)</p>
-			<p><strong class="">2.</strong> MACD and RSI are both higher at L2 than they were at L1</p>
-			<p><strong class="text-skin-accent">3.</strong> volume at L2 is lower than it was at L1</p>
-			<p class="pt-2 pl-8 text-xs italic">* a low is defined as having 3 days before and after whith higher closes</p>
-		</div>
+  <Header />
+  <main class="mx-auto max-w-3xl flex flex-col px-4 py-8 gap-6 text-skin-base">
+    <p>
+      The <span class="font-bold underline underline-offset-2 decoration-2">Vaidya Signal</span> is a bottom reversal
+      signal which is triggered when the following conditions are met:
+    </p>
+    <div class="pl-8">
+      <p><strong class="text-skin-accent">1.</strong> the current low * (L2) is lower than the previous low (L1)</p>
+      <p><strong class="">2.</strong> MACD and RSI are both higher at L2 than they were at L1</p>
+      <p><strong class="text-skin-accent">3.</strong> volume at L2 is lower than it was at L1</p>
+      <p class="pt-2 pl-8 text-xs italic">* a low is defined as having 3 days before and after whith higher closes</p>
+    </div>
 
-		<!-- hr -->
-		<div class="mx-auto max-w-3xl w-full my-6 border-b-[1px] border-skin-line" />
-		
-		<div class="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-			<!-- recent triggers -->
-			<div class="flex flex-col gap-4 sm:border-r-[1px] border-skin-line">
-				<h2 class="text-2xl font-bold text-center pb-4">RECENT</h2>
-				<RecentSignals client:load />
-			</div>
+    <!-- hr -->
+    <div class="mx-auto max-w-3xl w-full my-6 border-b-[1px] border-skin-line"></div>
 
-			<!-- hr when on small screens -->
-			<div class="mx-12 my-4 sm:hidden border-b-[1px] border-skin-line" />
+    <div class="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- recent triggers -->
+      <div class="flex flex-col gap-4 sm:border-r-[1px] border-skin-line">
+        <h2 class="text-2xl font-bold text-center pb-4">RECENT</h2>
+        <RecentSignals client:load />
+      </div>
 
-			<!-- search panel -->
-			<div class="flex flex-col gap-4 px-4">
-				<h2 class="text-2xl font-bold text-center pb-2">SEARCH</h2>
-				<div class="grid grid-cols-6 gap-4">
-					<div class="col-span-6 pb-4"><SearchBar client:load /></div>
-					<div class="col-span-2"><TickerButton ticker='SPY' /></div>
-					<div class="col-span-2"><TickerButton ticker='QQQ' /></div>
-					<div class="col-span-2"><TickerButton ticker='AAPL' /></div>
-					<div class="col-span-1" />
-					<div class="col-span-2"><TickerButton ticker='NVDA' /></div>
-					<div class="col-span-2"><TickerButton ticker='IWM' /></div>
-					<div class="col-span-1" />
-				</div>
-				
-			</div>
-		</div>
+      <!-- hr when on small screens -->
+      <div class="mx-12 my-4 sm:hidden border-b-[1px] border-skin-line"></div>
 
-		<!-- <CandleStickChart client:load ticker="SPY" /> -->
+      <!-- search panel -->
+      <div class="flex flex-col gap-4 px-4">
+        <h2 class="text-2xl font-bold text-center pb-2">SEARCH</h2>
+        <div class="grid grid-cols-6 gap-4">
+          <div class="col-span-6 pb-4"><SearchBar client:load /></div>
+          <div class="col-span-2"><TickerButton ticker="SPY" /></div>
+          <div class="col-span-2"><TickerButton ticker="QQQ" /></div>
+          <div class="col-span-2"><TickerButton ticker="AAPL" /></div>
+          <div class="col-span-1"></div>
+          <div class="col-span-2"><TickerButton ticker="NVDA" /></div>
+          <div class="col-span-2"><TickerButton ticker="IWM" /></div>
+          <div class="col-span-1"></div>
+        </div>
+      </div>
+    </div>
 
-		<!-- <SignalsTest client:load /> -->
-	</main>
-	<Footer />
+    <!-- <CandleStickChart client:load ticker="SPY" /> -->
+
+    <!-- <SignalsTest client:load /> -->
+  </main>
+  <Footer />
 </Layout>
