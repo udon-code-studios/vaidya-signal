@@ -9,7 +9,7 @@ export default function Header(
   return (
     <header>
       <div className="mx-auto flex max-w-3xl flex-col items-center justify-between sm:flex-row">
-        <div className="flex w-full justify-between p-4 items-center py-8">
+        <div className="flex w-full justify-between p-4 items-center py-8 flex-col gap-4 sm:gap-0 sm:flex-row">
           <a
             href="/"
             className="py-1 text-xl font-semibold sm:static"
