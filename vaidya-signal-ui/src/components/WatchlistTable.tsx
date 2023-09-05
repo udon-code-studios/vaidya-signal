@@ -4,7 +4,6 @@ import {
   sortWatchlistByLastTrigger,
   sortWatchlistByTicker,
 } from "../utils/pure";
-import { removeFromWatchlist } from "../utils/supabase";
 
 export default function WatchlistTable() {
   const [watchlist, setWatchlist] = useState<
