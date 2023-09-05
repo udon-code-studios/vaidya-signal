@@ -11,7 +11,7 @@ export default function RecentSignals() {
     (async () => {
       const res = await fetch("/api/watchlist");
       const data = await res.json();
-      setWatchlist(sortWatchlistByLastTrigger(data.slice(0, 7))); // only show the first 7
+      setWatchlist(sortWatchlistByLastTrigger(data).slice(0, 7)); // only show the first 7
     })();
   }, []);
 
@@ -22,9 +22,7 @@ export default function RecentSignals() {
           <div className="grid grid-cols-5 hover:text-skin-accent hover:underline underline-offset-2 decoration-2 content-end">
             <div className="mx-auto col-span-2 font-bold">{ticker.ticker}</div>
             <div className="mr-auto col-span-2">
-              {ticker.last_trigger
-                ? daysAgo(new Date(ticker.last_trigger))
-                : "never"}
+              {ticker.last_trigger ? daysAgo(ticker.last_trigger) : "never"}
             </div>
             <div className="mr-auto pl-2">➔</div>
           </div>

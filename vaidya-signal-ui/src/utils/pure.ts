@@ -1,5 +1,8 @@
-export function daysAgo(date: Date) {
+export function daysAgo(dateString: string) {
+  let date = new Date(dateString);
+  date = new Date(date.getTime() + Math.abs(date.getTimezoneOffset() * 60000));
   const today = new Date();
+
   const diff = today.getTime() - date.getTime();
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 

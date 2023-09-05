@@ -48,7 +48,7 @@ const inWatchlist = await existsInWatchlist(ticker || "");
               .map((trigger) => (
                 <li>
                   <span class="pl-2">{`${new Date(trigger.trigger_date).toISOString().split("T")[0]} `}</span>
-                  <span class="font-bold pl-2">{`(${daysAgo(new Date(trigger.trigger_date))})`}</span>
+                  <span class="font-bold pl-2">{`(${daysAgo(trigger.trigger_date)})`}</span>
                   <span class="text-xs">
                     <span class="italic pl-2"> low 1: </span>
                     <span class="font-bold">{new Date(trigger.low_1_date).toISOString().split("T")[0]}</span>
@@ -65,6 +65,6 @@ const inWatchlist = await existsInWatchlist(ticker || "");
         }
       </ul>
     </div>
-    <Footer />
   </main>
+  <Footer />
 </Layout>

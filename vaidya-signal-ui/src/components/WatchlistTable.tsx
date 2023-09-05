@@ -75,17 +75,17 @@ export default function WatchlistTable() {
             <a
               href={`/ticker/${ticker.ticker}`}
               className="col-span-6 grid grid-cols-6 text-center hover:text-skin-accent hover:underline underline-offset-2 decoration-2 py-1"
+              key={`${i}-a`}
             >
               <div className="col-span-3 font-bold">
                 {ticker.ticker}
               </div>
               <div className="col-span-3">
-                {ticker.last_trigger
-                  ? daysAgo(new Date(ticker.last_trigger))
-                  : "never"}
+                {ticker.last_trigger ? daysAgo(ticker.last_trigger) : "never"}
               </div>
             </a>
             <button
+              key={`${i}-button`}
               className="col-span-1 text-red-500 hover:underline decoration-2 decoration-dashed underline-offset-2 decoration-red-500 text-center w-min mx-auto px-3 py-1"
               onClick={async () => {
                 await fetch("/api/watchlist", {
