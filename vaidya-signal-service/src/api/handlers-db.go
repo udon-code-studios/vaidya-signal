@@ -62,3 +62,20 @@ func (db *Database) AddTickerHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(signalsJSON)
 }
+
+func (db *Database) UpdateWatchlistHandler(w http.ResponseWriter, r *http.Request) {
+	// log request invocation
+	fmt.Println("[ INFO ] Request received for URI:", r.RequestURI, "and method:", r.Method)
+
+	// return wrong method if not POST
+	if r.Method != "POST" {
+		fmt.Println("[ INFO ] Method", r.Method, "is not allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	S.ScanWatchlist(db.DB)
+
+	// return 200 OK
+	w.WriteHeader(http.StatusOK)
+}

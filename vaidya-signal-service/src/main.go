@@ -52,11 +52,12 @@ func main() {
 	http.HandleFunc("/", A.UselessHandler)
 	http.HandleFunc("/hello", A.UselessHandler)
 	http.HandleFunc("/alive", A.UselessHandler)
-	http.HandleFunc("/api/v1/add-ticker", database.AddTickerHandler)
+	// http.HandleFunc("/api/v1/add-ticker", database.AddTickerHandler)
 	// http.HandleFunc("/api/v1/remove-ticker", A.UselessHandler)
 	// http.HandleFunc("/api/v1/add-email", A.UselessHandler)
 	// http.HandleFunc("/api/v1/remove-email", A.UselessHandler)
 	http.HandleFunc("/api/v1/get-signal-triggers", A.GetVaidyaSignalsHandler)
+	http.HandleFunc("/api/v1/update-watchlist", database.UpdateWatchlistHandler)
 
 	// start server
 	log.Fatal(http.ListenAndServe(":"+port, nil))
