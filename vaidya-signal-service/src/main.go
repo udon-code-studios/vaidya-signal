@@ -8,6 +8,7 @@ import (
 	"time"
 
 	A "github.com/udon-code-sudios/vaidya-signal-service/api"
+	S "github.com/udon-code-sudios/vaidya-signal-service/service"
 
 	"github.com/go-co-op/gocron"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -34,7 +35,13 @@ func main() {
 	//--------------------------------------------------------------------------
 
 	scheduler := gocron.NewScheduler(time.UTC)
-	scheduler.Every(1).Hour().Do(func() { fmt.Println("[ INFO ] Service is still running...") })
+	scheduler.Every(1).Hour().Do(func() {
+		fmt.Println("[ INFO ] Service is still running...")
+	})
+	scheduler.Every(1).Day().At("16:15").Do(func() {
+		fmt.Println("[ INFO ] Running daily watchlist scan...")
+		S.ScanWatchlist(db)
+	})
 	scheduler.StartAsync()
 
 	//--------------------------------------------------------------------------

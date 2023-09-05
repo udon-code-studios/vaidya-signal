@@ -1,6 +1,9 @@
 package service
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type DaysTable struct {
 	Date   time.Time `db:"date"`
@@ -26,6 +29,6 @@ type VaidyaSignalsTable struct {
 }
 
 type WatchlistTable struct {
-	Ticker      string    `db:"ticker"`
-	LastTrigger time.Time `db:"last_trigger"`
+	Ticker      string       `db:"ticker"`
+	LastTrigger sql.NullTime `db:"last_trigger"`
 }
