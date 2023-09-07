@@ -43,7 +43,7 @@ func main() {
 	scheduler.Every(1).Hour().Do(func() {
 		fmt.Println("[ INFO ] Service is still running...")
 	})
-	scheduler.Every(1).Day().At("12:00").Do(func() {
+	scheduler.Every(1).Day().At("16:20").Do(func() {
 		fmt.Println("[ INFO ] Running daily watchlist scan...")
 		S.ScanWatchlist(db)
 	})
