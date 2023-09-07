@@ -20,7 +20,6 @@ func GetHistoricalVaidyaSignals(ticker string) []VaidyaSignalsTable {
 	fiveYearsAgo := today.AddDate(-5, 0, 0)
 	tenYearsAgo := today.AddDate(-10, 0, 0)
 
-	fmt.Println("-----------------------------------------------------------")
 	fmt.Println("[ INFO ] Starting detection for ticker:", ticker)
 
 	// get day bars for past 7 years from Alpaca
@@ -31,8 +30,8 @@ func GetHistoricalVaidyaSignals(ticker string) []VaidyaSignalsTable {
 	})
 
 	// print first and last bars
-	fmt.Println("[ DEBUG ] first bar:", bars[0])
-	fmt.Println("[ DEBUG ] last bar:", bars[len(bars)-1])
+	// fmt.Println("[ DEBUG ] first bar:", bars[0])
+	// fmt.Println("[ DEBUG ] last bar:", bars[len(bars)-1])
 
 	// loop over days to generate indicators
 	var last12EMA float64

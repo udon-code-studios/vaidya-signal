@@ -20,8 +20,7 @@ func ScanWatchlist(db *sqlx.DB) {
 		// if signals are found take last signal and update "watchlist" table
 		if len(signals) > 0 {
 			lastSignal := signals[len(signals)-1]
-			fmt.Println("[ DEBUG ] lastSignal:", lastSignal)
-			fmt.Println("[ DEBUG ] lastSignal.TriggerDate:", lastSignal.TriggerDate)
+			// fmt.Println("[ DEBUG ] lastSignal.TriggerDate:", lastSignal.TriggerDate)
 
 			// update "watchlist" table
 			db.Exec("UPDATE watchlist SET last_trigger = $1 WHERE ticker = $2", lastSignal.TriggerDate, ticker.Ticker)

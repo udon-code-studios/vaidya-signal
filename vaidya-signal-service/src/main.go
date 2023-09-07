@@ -34,14 +34,21 @@ func main() {
 	// Create cron job to print status every hour
 	//--------------------------------------------------------------------------
 
-	scheduler := gocron.NewScheduler(time.UTC)
+	// create scheduler
+	newYork, err := time.LoadLocation("America/New_York")
+	panicOnNotNil(err)
+	scheduler := gocron.NewScheduler(newYork)
+
+	// define jobs
 	scheduler.Every(1).Hour().Do(func() {
 		fmt.Println("[ INFO ] Service is still running...")
 	})
-	scheduler.Every(1).Day().At("16:15").Do(func() {
+	scheduler.Every(1).Day().At("12:00").Do(func() {
 		fmt.Println("[ INFO ] Running daily watchlist scan...")
 		S.ScanWatchlist(db)
 	})
+
+	// start scheduler
 	scheduler.StartAsync()
 
 	//--------------------------------------------------------------------------
