@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	U "github.com/udon-code-sudios/vaidya-signal-service/utils"
-
 	"github.com/alpacahq/alpaca-trade-api-go/v3/marketdata"
+	U "github.com/udon-code-sudios/vaidya-signal-service/utils"
 )
 
 // define constants
@@ -15,30 +14,55 @@ const EMA26_SMOOTHING float64 = 2
 const RSI_PERIOD int = 14
 const LOW_DETECTION int = 3 // # of days before and after a low that should have higher closes
 
-func GetHistoricalVaidyaSignals(ticker string) []VaidyaSignalsTable {
-	today := time.Now().Add(-15 * time.Minute) // 15 minutes are subtracted due to Alpaca free-tier limitations
-	fiveYearsAgo := today.AddDate(-5, 0, 0)
-	tenYearsAgo := today.AddDate(-10, 0, 0)
+func FindAllVaidyaSignalsForTickers(tickers []string) map[string][]VaidyaSignal {
+	// define map to return
+	signals := make(map[string][]VaidyaSignal)
 
-	fmt.Println("[ INFO ] Starting detection for ticker:", ticker)
+	// loop through tickers 10 at a time
+	for i := 0; i < len(tickers); i += 10 {
+		// get tickers to process
+		end := i + 10
+		if end > len(tickers) {
+			end = len(tickers)
+		}
 
-	// get day bars for past 7 years from Alpaca
-	bars, _ := marketdata.GetBars(ticker, marketdata.GetBarsRequest{
-		TimeFrame: marketdata.OneDay,
-		Start:     tenYearsAgo,
-		End:       today,
-	})
+		fmt.Println("[ INFO ] Processing tickers:", tickers[i:end])
 
-	// print first and last bars
-	// fmt.Println("[ DEBUG ] first bar:", bars[0])
-	// fmt.Println("[ DEBUG ] last bar:", bars[len(bars)-1])
+		// get day bars for tickers (up to 10 years)
+		today := time.Now().Add(-15 * time.Minute) // 15 minutes are subtracted due to Alpaca free-tier limitations
+		tenYearsAgo := today.AddDate(-10, 0, 0)
+		multiBars, _ := marketdata.GetMultiBars(tickers[i:end], marketdata.GetBarsRequest{
+			TimeFrame: marketdata.OneDay,
+			Start:     tenYearsAgo,
+			End:       today,
+		})
 
-	// loop over days to generate indicators
+		// detect signals for each ticker
+		for ticker, bars := range multiBars {
+			tickerDays := generateDaysFromAlpacaDayBars(bars)
+			tickerSignals := scanDaysForVaidyaSignals(tickerDays)
+			signals[ticker] = tickerSignals
+		}
+	}
+
+	return signals
+}
+
+//------------------------------------------------------------------------
+// helper functions
+//------------------------------------------------------------------------
+
+func generateDaysFromAlpacaDayBars(bars []marketdata.Bar) []Day {
+	// make sure there are enough bars (only 26th bar and on are used)
+	if len(bars) < 27 {
+		return make([]Day, 0)
+	}
+
 	var last12EMA float64
 	var last26EMA float64
 	var lastAvgGain float64 = 0 // for RSI
 	var lastAvgLoss float64 = 0 // for RSI
-	var days = make([]DaysTable, len(bars))
+	var days = make([]Day, len(bars))
 	for i, bar := range bars {
 		// copy Alpaca Bars into DaysTable
 		days[i].Date = bar.Timestamp
@@ -73,24 +97,11 @@ func GetHistoricalVaidyaSignals(ticker string) []VaidyaSignalsTable {
 		days[i].RSI = 100 - 100/(1+(lastAvgGain/lastAvgLoss))
 	}
 
-	//------------------------------------------------------------------------
-	// write data file
-	//------------------------------------------------------------------------
+	// only include days starting from 27th day
+	return days[26:]
+}
 
-	// // loop over days to generate output file
-	// for _, day := range days {
-	// 	// skip until 5 years ago date
-	// 	if day.Date.Before(fiveYearsAgo) {
-	// 		continue
-	// 	}
-
-	// 	query := `INSERT INTO days(ticker, date, open, high, low, close, volume, macd, rsi)
-	// 						VALUES(:ticker, :date, :open, :high, :low, :close, :volume, :macd, :rsi)`
-
-	// 	// insert row in db (doesn't check for errors)
-	// 	db.NamedExec(query, day)
-	// }
-
+func scanDaysForVaidyaSignals(days []Day) []VaidyaSignal {
 	//------------------------------------------------------------------------
 	// find local lows
 	//
@@ -100,23 +111,20 @@ func GetHistoricalVaidyaSignals(ticker string) []VaidyaSignalsTable {
 
 	var lows []int // indexes of lows
 find_lows:
-	for i, bar := range bars {
-		// skip lows that are not from last 5 years
-		if bar.Timestamp.Before(fiveYearsAgo) {
-			continue
-		}
-
-		// NOTE: local lows are defined as having a lower close than the three
-		// previous days and the three following days
+	for i, day := range days {
+		// // skip lows that are not from last 5 years
+		// if bar.Timestamp.Before(fiveYearsAgo) {
+		// 	continue
+		// }
 
 		// skip first and last three bars
-		if i < LOW_DETECTION || i >= len(bars)-LOW_DETECTION {
+		if i < LOW_DETECTION || i >= len(days)-LOW_DETECTION {
 			continue
 		}
 
 		// skip if close is not a low
 		for j := 1; j <= LOW_DETECTION; j++ {
-			if bar.Close > bars[i-j].Close || bar.Close > bars[i+j].Close {
+			if day.Close > days[i-j].Close || day.Close > days[i+j].Close {
 				continue find_lows
 			}
 		}
@@ -128,7 +136,7 @@ find_lows:
 	// find signal triggers
 	//------------------------------------------------------------------------
 
-	signals := make([]VaidyaSignalsTable, 0)
+	signals := make([]VaidyaSignal, 0)
 	for i, daysIdx := range lows {
 		// skip first low, as a previous low is needed
 		if i == 0 {
@@ -137,7 +145,7 @@ find_lows:
 
 		// skip if current low is not lower (i.e. is greater) than previous low
 		// NOTE: if lows are equal, it will not skip
-		if bars[daysIdx].Close > bars[lows[i-1]].Close {
+		if days[daysIdx].Close > days[lows[i-1]].Close {
 			continue
 		}
 
@@ -152,21 +160,11 @@ find_lows:
 		// skip if current low's volume is not lower (i.e. is greater) than the
 		// previous low's
 		// NOTE: if volumes are equal, it will not skip
-		if bars[daysIdx].Volume > bars[lows[i-1]].Volume {
+		if days[daysIdx].Volume > days[lows[i-1]].Volume {
 			continue
 		}
 
-		// query := `INSERT INTO vaidya_` + strings.ToLower(ticker) + ` (ticker, trigger_date, low_2_date, low_1_date)
-		// 					VALUES(:ticker, :trigger_date, :low_2_date, :low_1_date)`
-
-		// // insert row in db (doesn't check for errors)
-		// db.NamedExec(query, VaidyaSignalsTable{
-		// 	TriggerDate: days[daysIdx+LOW_DETECTION].Date,
-		// 	Low2Date:    days[daysIdx].Date,
-		// 	Low1Date:    days[lows[i-1]].Date,
-		// })
-
-		signals = append(signals, VaidyaSignalsTable{
+		signals = append(signals, VaidyaSignal{
 			TriggerDate: days[daysIdx+LOW_DETECTION].Date,
 			Low2Date:    days[daysIdx].Date,
 			Low1Date:    days[lows[i-1]].Date,
@@ -174,4 +172,25 @@ find_lows:
 	}
 
 	return signals
+}
+
+//------------------------------------------------------------------------
+// types
+//------------------------------------------------------------------------
+
+type Day struct {
+	Date   time.Time `db:"date"`
+	Open   float64   `db:"open"`
+	High   float64   `db:"high"`
+	Low    float64   `db:"low"`
+	Close  float64   `db:"close"`
+	Volume uint64    `db:"volume"`
+	MACD   float64   `db:"macd"`
+	RSI    float64   `db:"rsi"`
+}
+
+type VaidyaSignal struct {
+	TriggerDate time.Time `db:"trigger_date" json:"trigger_date"` // day signal was triggered
+	Low2Date    time.Time `db:"low_2_date" json:"low_2_date"`     // current low
+	Low1Date    time.Time `db:"low_1_date" json:"low_1_date"`     // previous low
 }

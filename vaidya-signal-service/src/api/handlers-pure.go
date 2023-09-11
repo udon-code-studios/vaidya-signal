@@ -2,19 +2,22 @@ package api
 
 import (
 	"encoding/json"
-
-	S "github.com/udon-code-sudios/vaidya-signal-service/service"
-
 	"fmt"
 	"net/http"
+	"strings"
+
+	S "github.com/udon-code-sudios/vaidya-signal-service/service"
 )
 
 func UselessHandler(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 
 	fmt.Println("Request received for URI:", r.RequestURI, "and method:", r.Method)
-	fmt.Fprintf(w, `{"message": "hello world."}`)
-	S.ExportedFunction()
+
+	replyBody := `{"message": "Hello world. I am alive."}`
+
+	fmt.Println("[ INFO ] Replying with:", replyBody)
+	fmt.Fprintf(w, replyBody)
 }
 
 func GetVaidyaSignalsHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,16 +33,21 @@ func GetVaidyaSignalsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	keys, ok := r.URL.Query()["ticker"]
+	keys, ok := r.URL.Query()["tickers"]
 
 	if !ok || len(keys[0]) < 1 {
-		fmt.Println("[ INFO ] Url Param 'ticker' is missing")
+		fmt.Println("[ INFO ] Url Param 'tickers' is missing")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	signals := S.GetHistoricalVaidyaSignals(keys[0])
+	// convert tickers from query param (comma-separated list) to array of strings
+	tickers := strings.Split(keys[0], ",")
 
+	// get signals for tickers
+	signals := S.FindAllVaidyaSignalsForTickers(tickers)
+
+	// return signals as JSON
 	signalsJSON, _ := json.Marshal(signals)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
