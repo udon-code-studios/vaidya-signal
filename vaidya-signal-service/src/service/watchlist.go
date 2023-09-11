@@ -9,6 +9,11 @@ import (
 	U "github.com/udon-code-sudios/vaidya-signal-service/utils"
 )
 
+func UpdateWatchlistThenEmailTodayTriggers(db *sqlx.DB) {
+	UpdateWatchlist(db)
+	EmailTodayWatchlistTriggers(db)
+}
+
 func UpdateWatchlist(db *sqlx.DB) {
 	// get watchlist from "watchlist" table and story in array
 	var watchlist []U.WatchlistTable
@@ -35,6 +40,8 @@ func UpdateWatchlist(db *sqlx.DB) {
 			db.Exec("UPDATE watchlist SET last_trigger = $1 WHERE ticker = $2", lastSignal.TriggerDate, ticker)
 		}
 	}
+
+	fmt.Println("[ INFO ] Finished updating watchlist")
 }
 
 func EmailTodayWatchlistTriggers(db *sqlx.DB) {
@@ -80,4 +87,6 @@ func EmailTodayWatchlistTriggers(db *sqlx.DB) {
 			),
 		)
 	}
+
+	fmt.Println("[ INFO ] Finished emailing today's watchlist triggers")
 }
