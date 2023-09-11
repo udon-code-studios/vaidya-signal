@@ -108,8 +108,7 @@ export const addToWatchlist = async (tickers: string) => {
 
   const insertions: { ticker: string; last_trigger?: string }[] = [];
   for (const ticker of tickersArray) {
-    const lastSignalTrigger = await getMostRecentSignalTrigger(ticker);
-    insertions.push({ ticker: ticker, last_trigger: lastSignalTrigger });
+    insertions.push({ ticker: ticker, last_trigger: undefined });
   }
 
   const { data, error } = await supabase
