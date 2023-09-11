@@ -54,6 +54,5 @@ func (db *Database) UpdateWatchlistEmailTodayTriggersHandler(w http.ResponseWrit
 	// return 202 Accepted
 	w.WriteHeader(http.StatusAccepted)
 
-	S.UpdateWatchlist(db.DB)
-	S.EmailTodayWatchlistTriggers(db.DB)
+	go S.UpdateWatchlistThenEmailTodayTriggers(db.DB)
 }
