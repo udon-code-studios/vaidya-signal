@@ -17,7 +17,7 @@ func UselessHandler(w http.ResponseWriter, r *http.Request) {
 	replyBody := `{"message": "Hello world. I am alive."}`
 
 	fmt.Println("[ INFO ] Replying with:", replyBody)
-	fmt.Fprintf(w, replyBody)
+	fmt.Fprint(w, replyBody)
 }
 
 func GetVaidyaSignalsHandler(w http.ResponseWriter, r *http.Request) {
