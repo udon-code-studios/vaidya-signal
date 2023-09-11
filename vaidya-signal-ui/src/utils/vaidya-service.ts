@@ -13,17 +13,15 @@ export const getSignalTriggers = async (ticker: string) => {
     return;
   }
 
-  const res = await fetch(`${vaidyaServiceUrl}/api/v1/get-signal-triggers?ticker=${ticker}`);
+  const res = await fetch(`${vaidyaServiceUrl}/api/v1/get-signal-triggers?tickers=${ticker}`);
 
-  if (res.ok) {
-    const json = (await res.json()) as [];
-
-    if (json.length === 0) {
-      return;
-    }
-
-    return json as SignalTrigger[];
+  if (!res.ok) {
+    return;
   }
+
+  const json = await res.json();
+
+  return json as { [ticker: string]: SignalTrigger[] };
 };
 
 export const getMostRecentSignalTrigger = async (ticker: string) => {
@@ -33,5 +31,5 @@ export const getMostRecentSignalTrigger = async (ticker: string) => {
     return;
   }
 
-  return triggers[triggers.length - 1].trigger_date;
+  return triggers[ticker][triggers[ticker].length - 1].trigger_date;
 };
