@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { getMostRecentSignalTrigger } from "./vaidya-service";
 
 //----------------------------------------------
 // supabase client

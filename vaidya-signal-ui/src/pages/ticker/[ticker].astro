@@ -42,8 +42,8 @@ const inWatchlist = await existsInWatchlist(ticker || "");
 
       <ul class="list-disc list-inside space-y-2 pl-4">
         {
-          triggers && triggers.length > 0 ? (
-            triggers
+          triggers && ticker && triggers[ticker] && triggers[ticker].length > 0 ? (
+            triggers[ticker]
               .sort((a, b) => new Date(b.trigger_date).getTime() - new Date(a.trigger_date).getTime())
               .map((trigger) => (
                 <li>
