@@ -19,7 +19,7 @@ func FindAllVaidyaSignalsForTickers(tickers []string) map[string][]VaidyaSignal 
 	signals := make(map[string][]VaidyaSignal)
 
 	// loop through tickers n at a time
-	n := 2
+	n := 25
 	for i := 0; i < len(tickers); i += n {
 		// get tickers to process
 		end := i + n
