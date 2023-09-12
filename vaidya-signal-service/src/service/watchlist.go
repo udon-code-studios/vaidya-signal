@@ -10,8 +10,18 @@ import (
 )
 
 func UpdateWatchlistThenEmailTodayTriggers(db *sqlx.DB) {
+	// record start time
+	startTime := time.Now()
+
 	UpdateWatchlist(db)
 	EmailTodayWatchlistTriggers(db)
+
+	// record end time
+	endTime := time.Now()
+
+	// calculate duration
+	duration := endTime.Sub(startTime)
+	fmt.Println("[ INFO ] UpdateWatchlist() and EmailTodayWatchlistTriggers() combined duration:", duration)
 }
 
 func UpdateWatchlist(db *sqlx.DB) {
