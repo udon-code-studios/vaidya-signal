@@ -7,7 +7,7 @@ const myHandler: Handler = async (event: HandlerEvent, context: HandlerContext) 
   console.log("[ INFO ] Inside scheduled-watchlist-scan-and-email.ts");
   console.log("[ INFO ] Time:", new Date());
 
-  fetch(`${vaidyaServiceUrl}/api/v1/update-watchlist-email-today-triggers`, {
+  await fetch(`${vaidyaServiceUrl}/api/v1/update-watchlist-email-today-triggers`, {
     method: "POST",
   });
 
