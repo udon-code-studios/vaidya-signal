@@ -1,7 +1,7 @@
 import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
 import { schedule } from "@netlify/functions";
 
-const vaidyaServiceUrl = import.meta.env.VAIDYA_SERVICE_URL;
+const vaidyaServiceUrl = "https://vaidya-service.udon.studio";
 
 const myHandler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
   console.log("[ INFO ] Inside scheduled-watchlist-scan-and-email.ts");
@@ -16,7 +16,8 @@ const myHandler: Handler = async (event: HandlerEvent, context: HandlerContext) 
   };
 };
 
-// every day at 4:20pm
-const handler = schedule("20 16 * * *", myHandler);
+// every day at 4:20pm EDT
+// const handler = schedule("20 20 * * *", myHandler);
+const handler = schedule("25 14 * * *", myHandler);
 
 export { handler };
