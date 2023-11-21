@@ -16,7 +16,7 @@ const myHandler: Handler = async (event: HandlerEvent, context: HandlerContext) 
   };
 };
 
-// every day at 4:20pm EDT
-const handler = schedule("20 20 * * *", myHandler);
+// every day at 4:20pm EST
+const handler = schedule("20 21 * * *", myHandler);
 
 export { handler };
